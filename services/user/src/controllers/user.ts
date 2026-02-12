@@ -7,14 +7,14 @@ export const loginUser = async (
   res: express.Response
 ) => {
   try {
-    const { name, email, image } = req.body;
-    if (!name || !email || !image) {
+    const { name, email } = req.body;
+    if (!name || !email) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     let user = await User.findOne({ email });
     if (!user) {
-      user = new User({ name, email, image });
+      user = new User({ name, email });
       await user.save();
     }
 
@@ -23,9 +23,8 @@ export const loginUser = async (
       process.env.JWT_SECRET as string,
       { expiresIn: "5d" }
     );
-    res.json({ token });
-  
-  
+
+    res.status(200).json({ message: "login success", token, user });
   } catch (error: any) {
     console.log(error);
   }
