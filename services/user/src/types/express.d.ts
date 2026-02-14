@@ -1,14 +1,14 @@
-import { Types } from "mongoose";
+// import { Types } from "mongoose";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        _id: string;
-        role: string;
-      };
-    }
-  }
-}
+// declare global {
+//   namespace Express {
+//     interface Request {
+//       user?: {
+//         _id: string;
+//         role: string;
+//       };
+//     }
+//   }
+// }
 
-export {};
+// export {};

@@ -1,8 +1,13 @@
 import {Request, Response,NextFunction} from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { IUser } from "../model/user.js";
+
+export interface AuthRequest extends Request {
+  user?: IUser | null;
+}
 
 export const isAuth = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -18,21 +23,20 @@ export const isAuth = async (
   }
 
   try {
-    const payLoad = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as {
-      _id: string;
-      role: string;
-    };
+    const payLoad = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as jwt.JwtPayload;
     if (!payLoad) {
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
-    // created the types for "req.user" in types/express.d.ts
-    req.user = { _id: payLoad._id, role: payLoad.role };
+    req.user = payLoad.user;
     return next();
   } catch (err) {
     console.log("jwt error", err);
     res.status(401).json({ message: "Unauthorized" });
-    return
+    return;
   }
 };
