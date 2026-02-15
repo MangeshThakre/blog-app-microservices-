@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface IUser extends Document {
   name: string;
   email: string;
-  image: string;
+  image: { imageId: string; url: string };
   instagram: string;
   facebook: string;
   linkedin: string;
@@ -14,7 +14,7 @@ const schema: Schema<IUser> = new Schema(
   {
     name: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    image: { type: String },
+    image: { type: Object },
     instagram: { type: String },
     facebook: { type: String },
     linkedin: { type: String },
