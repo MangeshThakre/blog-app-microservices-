@@ -1,0 +1,53 @@
+import express from "express";
+import dotenv from "dotenv";
+import { sql } from "./utils/db.js";
+import { authorRouter } from "./routes/author.js";
+dotenv.config();
+
+const app = express();
+
+const PORT = process.env.PORT || 8082;
+
+app.use(express.json());
+
+async function initDB() {
+  try {
+    await sql`CREATE TABLE IF NOT EXISTS blogs(
+        id SERIAL PRIMARY KEY,  
+        title VARCHAR(255) NOT NULL,
+        description VARCHAR(255) NOT NULL,
+        blogContent TEXT NOT NULL,
+        image VARCHAR(255) NOT NULL,
+        category VARCHAR(255) NOT NULL,
+        author VARCHAR(255) NOT NULL,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`;
+
+    await sql`CREATE TABLE IF NOT EXISTS comments(
+        id SERIAL PRIMARY KEY,  
+        comment VARCHAR(255) NOT NULL,
+        userId VARCHAR(255) NOT NULL,
+        userName VARCHAR(255) NOT NULL,
+        blogId VARCHAR(255) NOT NULL,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`;
+
+    await sql`CREATE TABLE IF NOT EXISTS savedBlogs(
+        id SERIAL PRIMARY KEY,  
+        userId VARCHAR(255) NOT NULL,
+        blogId VARCHAR(255) NOT NULL,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`;
+
+    console.log("database initialized successfully");
+  } catch (error) {
+    console.error("Error initializing database:", error);
+  }
+}
+
+app.use("/api/v1/authors", authorRouter)
+initDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Author service is running on port ${PORT}`);
+  });
+});
