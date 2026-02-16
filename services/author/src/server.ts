@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { sql } from "./utils/db.js";
 import { authorRouter } from "./routes/author.js";
+import fileUpload from "express-fileupload";
 dotenv.config();
 
 const app = express();
@@ -9,6 +10,13 @@ const app = express();
 const PORT = process.env.PORT || 8082;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/"
+  })
+);
 
 async function initDB() {
   try {
@@ -45,7 +53,7 @@ async function initDB() {
   }
 }
 
-app.use("/api/v1/authors", authorRouter)
+app.use("/api/v1/author", authorRouter);
 initDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Author service is running on port ${PORT}`);

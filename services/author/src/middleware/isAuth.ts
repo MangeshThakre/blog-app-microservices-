@@ -22,6 +22,7 @@ export const isAuth = async (
       token,
       process.env.JWT_SECRET as string
     ) as jwt.JwtPayload;
+
     if (!payLoad) {
       res.status(401).json({ message: "Unauthorized" });
       return;
@@ -29,7 +30,6 @@ export const isAuth = async (
 
     req.user = payLoad.user;
     return next();
-    
   } catch (err) {
     console.log("jwt error", err);
     res.status(401).json({ message: "Unauthorized" });
