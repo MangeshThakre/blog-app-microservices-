@@ -25,7 +25,7 @@ async function initDB() {
         title VARCHAR(255) NOT NULL,
         description VARCHAR(255) NOT NULL,
         blogContent TEXT NOT NULL,
-        image VARCHAR(255) NOT NULL,
+        image JSONB NOT NULL,
         category VARCHAR(255) NOT NULL,
         author VARCHAR(255) NOT NULL,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
