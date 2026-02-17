@@ -24,7 +24,7 @@ async function initDB() {
         id SERIAL PRIMARY KEY,  
         title VARCHAR(255) NOT NULL,
         description VARCHAR(255) NOT NULL,
-        blogContent TEXT NOT NULL,
+        blog_content TEXT NOT NULL,
         image JSONB NOT NULL,
         category VARCHAR(255) NOT NULL,
         author VARCHAR(255) NOT NULL,
