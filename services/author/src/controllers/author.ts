@@ -71,6 +71,8 @@ export const deleteBlog = TryCatch(async (req: Request, res: Response) => {
 
   const blog =
     await sql`DELETE FROM blogs WHERE id=${blogId} AND author=${userId} RETURNING *`;
+    await sql`DELETE FROM comments WHERE blogId=${blogId}`;
+    await sql`DELETE FROM savedBlogs WHERE blogId=${blogId}`;
 
   if (blog.length === 0) {
     res.status(404).json({
