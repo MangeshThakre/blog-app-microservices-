@@ -64,3 +64,20 @@ export const updateBlog = TryCatch(async (req: Request, res: Response) => {
     .status(200)
     .json({ message: "updatedBlog successfully", result: result[0] });
 });
+
+export const deleteBlog = TryCatch(async (req: Request, res: Response) => {
+  const userId = req.user?._id;
+  const blogId = req.params.id;
+
+  const blog =
+    await sql`DELETE FROM blogs WHERE id=${blogId} AND author=${userId} RETURNING *`;
+
+  if (blog.length === 0) {
+    res.status(404).json({
+      message: "Blog not found or you are not authorized to delete this blog"
+    });
+    return;
+  }
+
+  res.status(200).json({ message: "blog deleted successfully" });
+});
