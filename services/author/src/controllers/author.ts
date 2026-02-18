@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { sql } from "../utils/db.js";
 import TryCatch from "../utils/tryCatch.js";
+import cloudinary from "../config/cloudinary.js";
 
 export const newBlog = TryCatch(async (req: Request, res: Response) => {
   const { title, description, blog_content, category } = req.body;
@@ -30,7 +31,6 @@ export const updateBlog = TryCatch(async (req: Request, res: Response) => {
   const image = req.image;
 
   const blog = await sql`SELECT * FROM blogs WHERE id=${blogId}`;
-
   // check if blog exists
   if (blog.length === 0) {
     res.status(404).json({ message: "Blog not found" });
@@ -71,8 +71,8 @@ export const deleteBlog = TryCatch(async (req: Request, res: Response) => {
 
   const blog =
     await sql`DELETE FROM blogs WHERE id=${blogId} AND author=${userId} RETURNING *`;
-    await sql`DELETE FROM comments WHERE blogId=${blogId}`;
-    await sql`DELETE FROM savedBlogs WHERE blogId=${blogId}`;
+  await sql`DELETE FROM comments WHERE blogId=${blogId}`;
+  await sql`DELETE FROM savedBlogs WHERE blogId=${blogId}`;
 
   if (blog.length === 0) {
     res.status(404).json({
@@ -80,6 +80,12 @@ export const deleteBlog = TryCatch(async (req: Request, res: Response) => {
     });
     return;
   }
+
+  //  delete blog image form cloudinary
+  // const imageId = blog[0].image?.imageId;
+  // if (imageId) {
+  //   const result = await cloudinary.uploader.destroy(imageId);
+  // }
 
   res.status(200).json({ message: "blog deleted successfully" });
 });
