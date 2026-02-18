@@ -40,3 +40,13 @@ export const addComment = TryCatch(async (req: Request, res: Response) => {
     .status(200)
     .json({ message: "comment added successfully", result: result[0] });
 });
+
+export const getAllComments = TryCatch(async (req: Request, res: Response) => {
+  const blogId = req.params.blogId;
+
+  const result = await sql`SELECT * FROM COMMENTS WHERE blog_id=${blogId}`;
+
+  res
+    .status(200)
+    .json({ message: "successfully got all the comment", result: result });
+});
