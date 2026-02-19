@@ -16,6 +16,7 @@ export const getSingleBlog = TryCatch(async (req: Request, res: Response) => {
 
   if (singleBlog.length === 0) {
     res.status(400).json({ message: "blog not found" });
+    return;
   }
 
   res
@@ -30,6 +31,7 @@ export const addComment = TryCatch(async (req: Request, res: Response) => {
   const { _id, name } = req.user;
   if (!comment) {
     res.status(400).json({ message: "comment is required" });
+    return;
   }
 
   const result =
@@ -49,4 +51,54 @@ export const getAllComments = TryCatch(async (req: Request, res: Response) => {
   res
     .status(200)
     .json({ message: "successfully got all the comment", result: result });
+});
+
+export const deleteComment = TryCatch(async (req: Request, res: Response) => {
+  const commentId = req.params.commentId;
+  const userId = req.user?._id;
+
+  const result =
+    await sql`DELETE FROM comments WHERE id=${commentId} AND user_id=${userId} RETURNING *`;
+
+  if (result.length === 0) {
+    res.status(400).json({ message: "comment not found" });
+    return;
+  }
+
+  res
+    .status(200)
+    .json({ message: "successfully deleted the comment", result: result[0] });
+});
+
+export const saveBlog = TryCatch(async (req: Request, res: Response) => {
+  const userId = req.user?._id;
+  const blogId = req.params.blogId;
+
+  const blog = await sql`select * FROM blogs WHERE id=${blogId}`;
+  if (blog.length === 0) {
+    res
+      .status(400)
+      .json({ message: "no blog available related to the blog id" });
+    return;
+  }
+
+  const result =
+    await sql`INSERT INTO saved_blogs (user_id, blog_id) VALUES (${userId} , ${blogId}) RETURNING *`;
+
+  res
+    .status(200)
+    .json({ message: "successfully save the blog", result: result[0] });
+});
+
+export const getSavedBlogs = TryCatch(async (req: Request, res: Response) => {
+  const userId = req.user?._id;
+
+  const result = await sql`SELECT * FROM saved_blogs WHERE user_id=${userId}`;
+
+  if (result.length === 0) {
+    res.status(400).json({ message: "no save blogs" });
+  }
+  res
+    .status(200)
+    .json({ message: "successfully got all saved blogs", result: result });
 });
