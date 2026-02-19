@@ -12,7 +12,7 @@ const UserRouter = express.Router();
 
 UserRouter.post("/login", loginUser);
 UserRouter.get("/me", isAuth, me);
-UserRouter.get("/profile/:id", isAuth, getUserProfile);
+UserRouter.get("/profile/:id", getUserProfile);
 UserRouter.put("/profilePicture", isAuth, updateUserProfilePicture);
 
 export default UserRouter;

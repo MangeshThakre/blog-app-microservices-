@@ -2,18 +2,20 @@ import express, { json, urlencoded } from "express";
 import dotenv from "dotenv";
 import { BlogRouter } from "./routes/blog.js";
 import fileUpload from "express-fileupload";
+import cors from "cors";
 dotenv.config();
 const PORT = process.env.PORT || "8083";
 
 const app = express();
 app.use(express.json()); // to read json value
-app.use(express.urlencoded({ extended: true }));  // to read url encoded
+app.use(express.urlencoded({ extended: true })); // to read url encoded
 app.use(
   fileUpload({
     useTempFiles: true,
     tempFileDir: "/tmp/"
   })
-);  // to read form data
+); // to read form data
+app.use(cors());
 
 app.use("/api/v1/", BlogRouter);
 

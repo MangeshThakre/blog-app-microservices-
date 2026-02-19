@@ -12,7 +12,7 @@ import { isAuth } from "../middleware/isAuth.js";
 export const BlogRouter = express.Router();
 
 BlogRouter.get("/blog/all", getAllBlogs);
-BlogRouter.get("/blog/:id", getSingleBlog);
+BlogRouter.get("/blog/:blogId", getSingleBlog);
 BlogRouter.post("/comment/:blogId", isAuth, addComment);
 BlogRouter.get("/comment/:blogId", getAllComments);
 BlogRouter.delete("/comment/:commentId", isAuth, deleteComment);

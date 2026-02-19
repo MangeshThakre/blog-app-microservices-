@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import TryCatch from "../utils/tryCatch.js";
 import { sql } from "../utils/db.js";
+import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const getAllBlogs = TryCatch(async (req: Request, res: Response) => {
   const allBlogs = await sql`SELECT * FROM blogs`;
@@ -11,7 +15,8 @@ export const getAllBlogs = TryCatch(async (req: Request, res: Response) => {
 });
 
 export const getSingleBlog = TryCatch(async (req: Request, res: Response) => {
-  const blogId = req.params.id;
+  const blogId = req.params.blogId;
+
   const singleBlog = await sql`SELECT * FROM blogs WHERE id =${blogId}`;
 
   if (singleBlog.length === 0) {
@@ -19,9 +24,14 @@ export const getSingleBlog = TryCatch(async (req: Request, res: Response) => {
     return;
   }
 
-  res
-    .status(400)
-    .json({ message: "successfully found the blog", result: singleBlog[0] });
+  const { data } = await axios.get(
+    `${process.env.USER_SERVICE}/user/profile/${singleBlog[0].author}`
+  );
+
+  res.status(400).json({
+    message: "successfully found the blog",
+    result: { blog: singleBlog[0], author: data.user }
+  });
 });
 
 export const addComment = TryCatch(async (req: Request, res: Response) => {

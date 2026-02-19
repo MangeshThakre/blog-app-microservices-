@@ -10,12 +10,10 @@ const PORT = process.env.PORT || 8081;
 const app = express();
 app.use(express.json());
 app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }));
- 
 
 cloudinaryConfig;
 // database connection
 connectDB();
-
 
 app.use("/api/v1/user", userRouter);
 
