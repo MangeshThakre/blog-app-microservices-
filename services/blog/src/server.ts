@@ -3,12 +3,14 @@ import dotenv from "dotenv";
 import { BlogRouter } from "./routes/blog.js";
 import fileUpload from "express-fileupload";
 import cors from "cors";
-
 import redis, { createClient } from "redis";
 import { Connection } from "@neondatabase/serverless";
+import { startCacheConsumer } from "./utils/consumer.js";
 dotenv.config();
+
 const PORT = process.env.PORT || "8083";
 
+startCacheConsumer();
 const app = express();
 app.use(express.json()); // to read json value
 app.use(express.urlencoded({ extended: true })); // to read url encoded

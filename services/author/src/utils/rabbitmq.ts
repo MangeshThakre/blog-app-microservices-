@@ -30,18 +30,22 @@ export const publishToQueue = async (queueName: string, message: any) => {
     channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)), {
       persistent: true
     });
+
     console.log(`Message published to queue ${queueName}`);
   } catch (error) {
     console.error("Error publishing to queue:", error);
   }
 };
 
-export const invalidateCacheJob = async (cacheKey: string[]) => {
-
-try {
-  
-} catch (error) {
-  
-}
-
+export const invalidateCacheJob = async (cacheKeys: string[]) => {
+  try {
+    const message = {
+      action: "invalidateCache",
+      key: cacheKeys
+    };
+    await publishToQueue("cache_invalidation_queue", message);
+    console.log("Cache invalidation job published:", message);
+  } catch (error) {
+    console.error("Error creating invalidate cache job:", error);
+  }
 };
