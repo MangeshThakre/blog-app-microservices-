@@ -3,10 +3,12 @@ import dotenv from "dotenv";
 import { sql } from "./utils/db.js";
 import { authorRouter } from "./routes/author.js";
 import fileUpload from "express-fileupload";
+import { connectRabbitMQ } from "./utils/rabbitmq.js";
+
 dotenv.config();
 
 const app = express();
-
+connectRabbitMQ();
 const PORT = process.env.PORT || 8082;
 
 app.use(express.json());

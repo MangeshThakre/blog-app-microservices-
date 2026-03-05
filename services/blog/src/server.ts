@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 import { BlogRouter } from "./routes/blog.js";
 import fileUpload from "express-fileupload";
 import cors from "cors";
+
+import redis, { createClient } from "redis";
+import { Connection } from "@neondatabase/serverless";
 dotenv.config();
 const PORT = process.env.PORT || "8083";
 
@@ -16,6 +19,17 @@ app.use(
   })
 ); // to read form data
 app.use(cors());
+
+export const redisClient = createClient({
+  url: process.env.REDIS_URL
+});
+
+redisClient
+  .connect()
+  .then(() => {
+    console.log("connect to redis");
+  })
+  .catch(console.error);
 
 app.use("/api/v1/", BlogRouter);
 

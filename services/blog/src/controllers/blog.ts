@@ -3,7 +3,6 @@ import TryCatch from "../utils/tryCatch.js";
 import { sql } from "../utils/db.js";
 import axios from "axios";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 export const getAllBlogs = TryCatch(async (req: Request, res: Response) => {
