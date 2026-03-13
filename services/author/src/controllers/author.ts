@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { sql } from "../utils/db.js";
 import TryCatch from "../utils/tryCatch.js";
 import cloudinary from "../config/cloudinary.js";
+import { invalidateCacheJob } from "../utils/rabbitmq.js";
 
 export const newBlog = TryCatch(async (req: Request, res: Response) => {
   const { title, description, blog_content, category } = req.body;
@@ -19,6 +20,9 @@ export const newBlog = TryCatch(async (req: Request, res: Response) => {
     await sql`INSERT INTO BLOGS (title, description, author, blog_content, category,image) VALUES 
   (${title},${description},${userId}, ${blog_content},${category},${image}) RETURNING *`;
   console.log(result);
+
+  await invalidateCacheJob([`blog:*`]);
+
   res
     .status(200)
     .json({ message: "New blog created successfully", result: result[0] });

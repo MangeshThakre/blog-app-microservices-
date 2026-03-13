@@ -3,14 +3,45 @@ import TryCatch from "../utils/tryCatch.js";
 import { sql } from "../utils/db.js";
 import axios from "axios";
 import dotenv from "dotenv";
+import { redisClient } from "../server.js";
 dotenv.config();
 
 export const getAllBlogs = TryCatch(async (req: Request, res: Response) => {
-  const allBlogs = await sql`SELECT * FROM blogs`;
+  const { searchQuery = "", category = "" } = req.query;
+
+  const cacheKey = `blogs:${searchQuery}:${category}`;
+
+  const cached = await redisClient.get(cacheKey);
+
+  if (cached) {
+    console.log("Serving from Redis cache");
+    res.json(JSON.parse(cached));
+    return;
+  }
+  let blogs;
+
+  if (searchQuery && category) {
+    blogs = await sql`SELECT * FROM blogs WHERE (title ILIKE ${
+      "%" + searchQuery + "%"
+    } OR description ILIKE ${
+      "%" + searchQuery + "%"
+    }) AND category = ${category} ORDER BY create_at DESC`;
+  } else if (searchQuery) {
+    blogs = await sql`SELECT * FROM blogs WHERE (title ILIKE ${
+      "%" + searchQuery + "%"
+    } OR description ILIKE ${"%" + searchQuery + "%"}) ORDER BY create_at DESC`;
+  } else if (category) {
+    blogs =
+      await sql`SELECT * FROM blogs WHERE category=${category} ORDER BY create_at DESC`;
+  } else {
+    blogs = await sql`SELECT * FROM blogs ORDER BY create_at DESC`;
+  }
+
+  await redisClient.set(cacheKey, JSON.stringify(blogs), { EX: 3600 });
 
   res
     .status(200)
-    .json({ message: "successfully fetch all blogs", result: allBlogs });
+    .json({ message: "successfully fetch all blogs", result: blogs });
 });
 
 export const getSingleBlog = TryCatch(async (req: Request, res: Response) => {
