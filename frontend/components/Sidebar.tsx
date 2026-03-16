@@ -3,7 +3,13 @@
 import React from "react";
 
 function Sidebar() {
-  return <div className="h-full bg-gray-200 p-4 w-64">Sidebar</div>;
+  return <div className="h-full bg-gray-200 p-4 w-64">
+    
+    
+
+
+
+    </div>;
 }
 
 export default Sidebar;

@@ -5,6 +5,8 @@ import { AuthRequest } from "../middleware/isAuth.js";
 import { UploadApiOptions } from "cloudinary";
 import { IUser } from "../model/user.js";
 import { v2 as cloudinary } from "cloudinary";
+import axios from "axios";
+import { oauth2Client } from "../utils/googleConfig.js";
 
 export interface CloudinaryUploadRequest extends Request {
   files?: {
@@ -16,22 +18,53 @@ export interface CloudinaryUploadRequest extends Request {
 import TryCatch from "../utils/TryCatch.js";
 
 export const loginUser = TryCatch(async (req, res) => {
-  const { name, email } = req.body;
-  if (!name || !email) {
-    return res.status(400).json({ message: "All fields are required" });
+  const { code } = req.body;
+  if (!code) {
+    res.status(400).json({
+      message: "Authorization code is required"
+    });
+    return;
   }
+
+  console.log("29");
+  const googleRes = await oauth2Client.getToken(code);
+
+  console.log(31);
+  oauth2Client.setCredentials(googleRes.tokens);
+  console.log(33);
+  const userRes = await axios.get(
+    `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
+  );
+
+  console.log("userRes", userRes.data);
+
+  const { email, name, picture } = userRes.data;
 
   let user = await User.findOne({ email });
+
   if (!user) {
-    user = new User({ name, email });
-    await user.save();
+    user = await User.create({
+      name,
+      email,
+      image: picture
+    });
   }
 
-  const token = jwt.sign({ user: user }, process.env.JWT_SECRET as string, {
+  const token = jwt.sign({ user }, process.env.JWT_SECRET as string, {
     expiresIn: "5d"
   });
 
-  res.status(200).json({ message: "login success", token, user });
+  console.log({
+    message: "Login success",
+    token,
+    user
+  });
+
+  res.status(200).json({
+    message: "Login success",
+    token,
+    user
+  });
 });
 
 export const me = TryCatch(async (req: AuthRequest, res) => {
