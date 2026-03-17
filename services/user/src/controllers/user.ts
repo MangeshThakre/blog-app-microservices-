@@ -7,6 +7,7 @@ import { IUser } from "../model/user.js";
 import { v2 as cloudinary } from "cloudinary";
 import axios from "axios";
 import { oauth2Client } from "../utils/googleConfig.js";
+import cookieOptions from "../utils/cookieOptions.js";
 
 export interface CloudinaryUploadRequest extends Request {
   files?: {
@@ -50,19 +51,20 @@ export const loginUser = TryCatch(async (req, res) => {
     });
   }
 
-  const token = jwt.sign({ user }, process.env.JWT_SECRET as string, {
+  const jwtToken = jwt.sign({ user }, process.env.JWT_SECRET as string, {
     expiresIn: "5d"
   });
 
   console.log({
     message: "Login success",
-    token,
+    token: jwtToken,
     user
   });
 
+  res.cookie("Token", jwtToken, cookieOptions);
   res.status(200).json({
     message: "Login success",
-    token,
+    token: jwtToken,
     user
   });
 });

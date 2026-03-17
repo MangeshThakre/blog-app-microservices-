@@ -5,13 +5,20 @@ import cors from "cors";
 import userRouter from "./routes/user.js";
 import fileUpload from "express-fileupload";
 import cloudinaryConfig from "./configuration/cloudinaryConfig.js";
+import cookieParser from "cookie-parser";
 dotenv.config();
 const PORT = process.env.PORT || 8081;
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }));
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true
+  })
+);
 cloudinaryConfig;
 // database connection
 connectDB();
